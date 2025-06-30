@@ -1,0 +1,145 @@
+[
+  {
+    "device_type": "Seat",
+    "features_description": "当前设备类型：\"座椅，Seat\"，可控属性occupancy的具体功能是当前座位是否有人\n当前设备类型：\"座椅，Seat\"，可控属性massage_mode的具体功能是按摩的模式，有两个可用值，其中`wave`代表波浪按摩，`pulse`代表脉冲按摩\n当前设备类型：\"座椅，Seat\"，可控属性massage_intensity的具体功能是按摩的强度\n当前设备类型：\"座椅，Seat\"，可控属性ventilation_intensity的具体功能是座椅通风的强度",
+    "devices_states": {
+      "seat_driver": {
+        "occupancy": false,
+        "massage_mode": "wave",
+        "massage_intensity": 0,
+        "ventilation_intensity": 0
+      },
+      "seat_passenger": {
+        "occupancy": false,
+        "massage_mode": "wave",
+        "massage_intensity": 0,
+        "ventilation_intensity": 0
+      },
+      "seat_rear_left": {
+        "occupancy": false,
+        "massage_mode": "wave",
+        "massage_intensity": 0,
+        "ventilation_intensity": 0
+      },
+      "seat_rear_right": {
+        "occupancy": false,
+        "massage_mode": "wave",
+        "massage_intensity": 0,
+        "ventilation_intensity": 0
+      }
+    }
+  },
+  {
+    "device_type": "MeituanApp",
+    "features_description": "当前设备类型：\"美团应用，MeituanApp\"，可控属性shop_data的具体功能是商家数据表，包含商家ID、名称、类型、菜品名和价格\n当前设备类型：\"美团应用，MeituanApp\"，可控属性shopping_cart的具体功能是购物车，存储菜品名及对应商家ID\n当前设备类型：\"美团应用，MeituanApp\"，可控属性delivery_locations的具体功能是配送地点信息，存储订单ID及其配送地点",
+    "devices_states": {
+      "meituan_app": {
+        "shop_data": "   shop_id shop_name shop_type dish_name  price\n0     S001      老张烤肉        烧烤       烤羊肉     68\n1     S001      老张烤肉        烧烤       烤牛肉     88\n2     S001      老张烤肉        烧烤       烤鸡翅     32\n3     S002      小李炒饭        快餐       蛋炒饭     16\n4     S002      小李炒饭        快餐      扬州炒饭     20\n5     S003      大王面馆        面食       牛肉面     28\n6     S003      大王面馆        面食       阳春面     16\n7     S003      大王面馆        面食       炸酱面     22\n8     S004      京都烤肉        烧烤      烤五花肉     98\n9     S004      京都烤肉        烧烤       烤牛肉    108\n10    S004      京都烤肉        烧烤       烤生蚝     88\n11    S005      阿香米线        面食      肉末米线     22\n12    S006      川味小馆        川菜      麻婆豆腐     38\n13    S006      川味小馆        川菜       回锅肉     48\n14    S007     粤式茶餐厅        粤菜       叉烧饭     32\n15    S007     粤式茶餐厅        粤菜       白切鸡     48\n16    S007     粤式茶餐厅        粤菜        虾饺     28\n17    S008      沙县小吃        快餐      三鲜炒面     15\n18    S008      沙县小吃        快餐      扬州炒饭     20\n19    S009      胖哥烤肉        烧烤       烤羊肉     58\n20    S009      胖哥烤肉        烧烤      烤五花肉     78\n21    S009      胖哥烤肉        烧烤       烤牛肉     88",
+        "shopping_cart": [],
+        "delivery_locations": {}
+      }
+    }
+  },
+  {
+    "device_type": "MusicPlayer",
+    "features_description": "当前设备类型：\"音乐播放器，MusicPlayer\"，可控属性play的具体功能是播放音乐\n当前设备类型：\"音乐播放器，MusicPlayer\"，可控属性pause的具体功能是暂停音乐\n当前设备类型：\"音乐播放器，MusicPlayer\"，可控属性volume的具体功能是音量大小\n当前设备类型：\"音乐播放器，MusicPlayer\"，可控属性current_music的具体功能是当前播放的音乐",
+    "devices_states": {
+      "music_player": {
+        "play": false,
+        "pause": false,
+        "volume": 50,
+        "current_music": null
+      }
+    }
+  },
+  {
+    "device_type": "VideoPlayer",
+    "features_description": "当前设备类型：\"视频播放器，VideoPlayer\"，可控属性play的具体功能是播放视频\n当前设备类型：\"视频播放器，VideoPlayer\"，可控属性pause的具体功能是暂停视频\n当前设备类型：\"视频播放器，VideoPlayer\"，可控属性volume的具体功能是音量大小\n当前设备类型：\"视频播放器，VideoPlayer\"，可控属性current_video的具体功能是当前播放的视频",
+    "devices_states": {
+      "video_player": {
+        "play": false,
+        "pause": false,
+        "volume": 50,
+        "current_video": null
+      }
+    }
+  },
+  {
+    "device_type": "Navigator",
+    "features_description": "当前设备类型：\"出行系统\"，可控属性end的具体功能是目的地\n当前设备类型：\"出行系统\"，可控属性start的具体功能是始发地\n当前设备类型：\"出行系统\"，可控属性path的具体功能是推荐的几个路径\n当前设备类型：\"出行系统\"，可控属性favorite的具体功能是收藏的地点：(home,company,others)",
+    "devices_states": {
+      "navigator": {
+        "end": null,
+        "start": null,
+        "path": null,
+        "favorite": null
+      }
+    }
+  },
+  {
+    "device_type": "Temperature_device",
+    "features_description": "当前设备类型：\"温度设备，Temperature\"，可控属性temperature的具体功能是车内或车外温度状态",
+    "devices_states": {
+      "temperature_inside": {
+        "temperature": 26
+      }
+    }
+  },
+  {
+    "device_type": "Tire",
+    "features_description": "当前设备类型：\"轮胎设备，Tire\"，可控属性tire_pressure_status的具体功能是胎压状态\n当前设备类型：\"轮胎设备，Tire\"，可控属性tire_temperature_status的具体功能是胎温状态",
+    "devices_states": {
+      "tire_left_front": {
+        "tire_pressure_status": 0,
+        "tire_temperature_status": 0
+      }
+    }
+  },
+  {
+    "device_type": "Timeclock",
+    "features_description": "当前设备类型：\"时钟，Timeclock\"，可控属性current_time的具体功能是当前时间",
+    "devices_states": {
+      "system_time": {
+        "current_time": "2025-04-02 20:08:32"
+      }
+    }
+  },
+  {
+    "device_type": "Battery",
+    "features_description": "当前设备类型：\"电池，battery\"，可控属性soc的具体功能是剩余电量",
+    "devices_states": {
+      "battery": {
+        "soc": 80
+      }
+    }
+  },
+  {
+    "device_type": "GPSDevice",
+    "features_description": "当前设备类型：\"gps定位系统，GPSDevice\"，可控属性longitude的具体功能是当前车所在位置的经度\n当前设备类型：\"gps定位系统，GPSDevice\"，可控属性latitude的具体功能是当前车所在位置的纬度",
+    "devices_states": {
+      "GPS": {
+        "longitude": 116.35,
+        "latitude": 39.96
+      }
+    }
+  },
+  {
+    "device_type": "Camera",
+    "features_description": "当前设备类型：\"车内摄像头，Camera\"，可控属性occupancy的具体功能是当前车内摄像头下是否有人\n当前设备类型：\"车内摄像头，Camera\"，可控属性face_id的具体功能是当前车内摄像头下用户的面容ID，如果当前摄像头下没人则将ID设置为0（有人时将为1到100）",
+    "devices_states": {
+      "camera_driver": {
+        "occupancy": true,
+        "face_id": 1
+      }
+    }
+  },
+  {
+    "device_type": "Voice",
+    "features_description": "当前设备类型：\"声音设备， Voice\"，可控属性voice_id的具体功能是当前说话用户所属ID",
+    "devices_states": {
+      "Voice_device": {
+        "voice_id": 0
+      }
+    }
+  }
+]

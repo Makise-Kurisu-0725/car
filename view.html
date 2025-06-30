@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智能驾舱实时监控系统</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background: #1a1a1a;
+            --text-color: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui;
+            background: var(--background);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-auto-rows: min-content;
+        }
+
+ /* 调整设备卡片高度 */
+        .device-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #map {
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .loading {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 5px;
+            display: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+         /* 美团服务容器优化 */
+         #meituan-container {
+            grid-column: span 2; /* 跨两列 */
+        }
+
+        #meituan-shops {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        /* 导航地图容器优化 */
+        #navigation-container {
+            grid-row: span 2; /* 跨两行 */
+            height: auto;
+        }
+
+        #map {
+            height: calc(100% - 40px); /* 减去标题高度 */
+        }
+
+ /* 座椅系统专用样式 */
+        #seat-container {
+            grid-column: span 2;
+            min-width: 620px; /* 保证最小宽度 */
+            overflow-x: auto; /* 添加水平滚动 */
+        }
+
+        .seat-control {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(300px, 1fr));
+            gap: 15px;
+            padding: 10px 5px; /* 增加两侧留白 */
+        }
+
+        .seat-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 15px;
+            min-width: 280px; /* 固定最小宽度 */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 15px;
+            flex: 1;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 0.95em;
+        }
+
+        /* 标签和数值样式 */
+        .status-item span:first-child {
+            color: rgba(255,255,255,0.7);
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+
+        .status-item span:last-child {
+            color: var(--text-color);
+            font-weight: 500;
+            text-align: right;
+            min-width: 60px;
+        }
+
+        /* 多媒体系统高度适配 */
+        #media-container .media-section {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* 新增滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 3px;
+        }
+
+        /* 响应式布局调整 */
+        @media (max-width: 480px) {
+            .seat-item h3 {
+                font-size: 1em;
+            }
+            
+            .status-item {
+                grid-template-columns: 30px 1fr;
+                font-size: 0.9em;
+            }
+            
+            .status-item span:last-child {
+                min-width: 40px;
+            }
+        }
+        @media (max-width: 1200px) {
+            #navigation-container {
+                grid-column: 1 / -1;
+                height: 400px;
+            }
+            
+            #meituan-container {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+            
+            .device-card {
+                min-height: auto;
+                max-height: none;
+            }
+
+            .seat-control {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-item {
+                padding: 8px 0;
+            }
+        }
+
+        /* 新增多媒体控制样式 */
+        .media-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .media-section h3 {
+            color: #3498db;
+            margin-top: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+        
+        /* 用户指令提交控制样式 */
+        .command-container {
+            grid-column: 1 / -1;  /* 跨全部列 */
+            margin-bottom: 20px;
+        }
+        .command-form {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        #commandInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            color: var(--text-color);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        #commandInput:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        }
+        #submitCommand {
+            padding: 12px 24px;
+            background: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #submitCommand:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+        #submitCommand:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .result-card {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+        }
+        .result-success {
+            border-left: 4px solid #2ecc71;
+        }
+        .result-error {
+            border-left: 4px solid #e74c3c;
+        }
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .result-content {
+            white-space: pre-wrap;
+            font-family: monospace;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+     <!-- 新增指令输入模块 -->
+     <div class="device-card command-container">
+        <h2>语音指令控制</h2>
+        <div class="command-form">
+            <input type="text" 
+                   id="commandInput" 
+                   placeholder="请输入控制指令，例如：调节主驾座椅通风到3档"
+                   autocomplete="off">
+            <button id="submitCommand" onclick="handleCommandSubmit()">执行指令</button>
+        </div>
+        <div id="commandResult"></div>
+    </div>
+
+    <div class="loading" id="loading">
+        <span class="spinner"></span>
+        <span>数据更新中...</span>
+    </div>
+
+    <!-- 动态内容容器 -->
+    <div class="device-card" id="seat-container"></div>
+    
+    <div class="device-card" id="vehicle-status">
+        <h2>车辆状态</h2>
+        <div class="status-item">
+            <span>电池电量</span>
+            <span id="battery-soc">--</span>
+        </div>
+        <div class="status-item">
+            <span>左前轮胎压</span>
+            <span id="tire-pressure">--</span>
+        </div>
+        <div class="status-item">
+            <span>车内温度</span>
+            <span id="temperature">--</span>
+        </div>
+    </div>
+
+    <div class="device-card" id="navigation-container">
+        <h2>导航系统</h2>
+        <div id="map"></div>
+    </div>
+
+    <div class="device-card" id="meituan-container">
+        <h2>美团服务</h2>
+        <div id="meituan-shops"></div>
+    </div>
+
+    <div class="device-card" id="media-container">
+        <h2>多媒体系统</h2>
+        <!-- 内容由 updateMediaControls() 动态生成 -->
+    </div>
+
+    <script>
+        // 新增用户指令处理函数
+        async function handleCommandSubmit() {
+        const input = document.getElementById('commandInput');
+        const button = document.getElementById('submitCommand');
+        const resultContainer = document.getElementById('commandResult');
+        
+        const command = input.value.trim();
+        if (!command) return;
+
+        button.disabled = true;
+        input.disabled = true;
+        resultContainer.innerHTML = '';
+
+        try {
+            const response = await fetch('http://localhost:8000/api/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: 'current_user', // 实际应用需要用户系统
+                    query: command
+                })
+            });
+
+            const result = await response.json();
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result-card ${
+                result.status === 'success' ? 'result-success' : 'result-error'
+            }`;
+            
+            if (result.status === 'success') {
+                resultDiv.innerHTML = `
+                    <div class="result-title">✅ 执行成功</div>
+                    <div class="result-content">
+                        执行计划：${JSON.stringify(result.plan, null, 2)}
+                        \n\n
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="result-title">⛔ 请求超时</div>
+                    <div class="result-content">${result.message}</div>
+                `;
+            }
+            
+            resultContainer.appendChild(resultDiv);
+        } catch (error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'result-card result-error';
+            errorDiv.innerHTML = `
+                <div class="result-title">⚠️ 网络错误</div>
+                <div class="result-content">${error.message}</div>
+            `;
+            resultContainer.appendChild(errorDiv);
+        } finally {
+            button.disabled = false;
+            input.disabled = false;
+            input.value = '';
+            input.focus();
+        }
+    }
+
+        // 添加回车键支持
+        document.getElementById('commandInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleCommandSubmit();
+        });
+
+        let mapInstance = null;
+        let currentData = null;
+
+        // 状态映射配置
+        const statusMappings = {
+            Seat: {
+                occupancy: value => value ? '🟢 占用' : '⚪ 空闲',
+                massage_mode: {
+                    wave: '🌊 波浪模式',
+                    pulse: '💓 脉冲模式'
+                },
+                massage_intensity: value => `${value} 档`,
+                ventilation_intensity: value => `${value} 档`
+            },
+            Tire: {
+                tire_pressure_status: {
+                    0: '🟢 正常',
+                    1: '🟡 偏低',
+                    2: '🔴 过低'
+                }
+            }
+        };
+
+        // 显示加载状态
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
+
+        // 隐藏加载状态
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // 获取最新数据
+        async function fetchData() {
+            try {
+                showLoading();
+                const response = await fetch('http://localhost:8000/api/environment-info');
+                if (!response.ok) throw new Error(`HTTP错误 ${response.status}`);
+                const newData = await response.json();
+                
+                if(JSON.stringify(newData) !== JSON.stringify(currentData)) {
+                    currentData = newData;
+                    updateAllComponents();
+                }
+            } catch (error) {
+                console.error('数据获取失败:', error);
+                showLoading() //alert('数据加载失败，请检查控制台');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // 更新所有组件
+        function updateAllComponents() {
+            updateSeats();
+            updateVehicleStatus();
+            updateMeituan();
+            updateMediaControls();
+            updateMap();
+        }
+
+        // 更新座椅状态显示函数
+        function updateSeats() {
+            const seatData = currentData.find(d => d.device_type === 'Seat');
+            const container = document.getElementById('seat-container');
+            
+            if (!seatData) return;
+
+            // 定义座位位置映射
+            const seatPositionMap = {
+                'seat_driver': '主驾驶位',
+                'seat_passenger': '副驾驶位',
+                'seat_rear_left': '左后座位',
+                'seat_rear_right': '右后座位'
+            };
+
+            // 定义显示顺序
+            const displayOrder = [
+                'seat_driver',
+                'seat_passenger', 
+                'seat_rear_left',
+                'seat_rear_right'
+            ];
+
+            container.innerHTML = `
+                <h2>座椅系统</h2>
+                <div class="seat-control">
+                    ${displayOrder.map(seatId => {
+                        const state = seatData.devices_states[seatId];
+                        return `
+                            <div class="seat-item">
+                                <h3>${seatPositionMap[seatId]}</h3>
+                                <div class="status-list">
+                                    ${Object.entries(state).map(([key, value]) => `
+                                        <div class="status-item">
+                                            <span>${getCompactLabel(key)}</span>
+                                            <span>${formatStatusValue('Seat', key, value)}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // 调整后的标签映射
+        function getCompactLabel(key) {
+            const labels = {
+                occupancy: '占用',
+                massage_mode: '按摩模式',
+                massage_intensity: '按摩',  // 简化为单字
+                ventilation_intensity: '通风' // 简化为单字
+            };
+            return labels[key] || key;
+        }
+
+        // 新增状态标签映射
+        function getLabel(key) {
+            const labels = {
+                occupancy: '占用状态',
+                massage_mode: '按摩模式',
+                massage_intensity: '按摩强度',
+                ventilation_intensity: '通风强度'
+            };
+            return labels[key] || key;
+        }
+
+        // 格式化状态值
+        function formatStatusValue(deviceType, key, value) {
+            const mapping = statusMappings[deviceType]?.[key];
+            if (typeof mapping === 'object') return mapping[value] || value;
+            if (typeof mapping === 'function') return mapping(value);
+            return value;
+        }
+
+        // 更新车辆状态
+        function updateVehicleStatus() {
+            const battery = currentData.find(d => d.device_type === 'Battery')?.devices_states.battery;
+            const tire = currentData.find(d => d.device_type === 'Tire')?.devices_states.tire_left_front;
+            const temp = currentData.find(d => d.device_type === 'Temperature_device')?.devices_states.temperature_inside;
+
+            if (battery) document.getElementById('battery-soc').textContent = `${battery.soc}%`;
+            if (tire) document.getElementById('tire-pressure').textContent = 
+                statusMappings.Tire.tire_pressure_status[tire.tire_pressure_status];
+            if (temp) document.getElementById('temperature').textContent = `${temp.temperature}℃`;
+        }
+
+        // 更新美团数据
+        function updateMeituan() {
+            const meituanData = currentData.find(d => d.device_type === 'MeituanApp');
+            const container = document.getElementById('meituan-shops');
+            
+            if (!meituanData) return;
+
+            const shopData = meituanData.devices_states.meituan_app.shop_data;
+            const rows = shopData.split('\n').filter(row => row.trim());
+            
+            container.innerHTML = `
+                <table>
+                    <thead style="position: sticky; top: 0; background: rgba(0,0,0,0.3);">
+                        ${rows[0].trim().split(/\s+/).map(cell => `<th>${cell}</th>`).join('')}
+                    </thead>
+                    <tbody>
+                        ${rows.slice(1).map(row => `
+                            <tr>${row.trim().split(/\s+/).map(cell => `<td>${cell}</td>`).join('')}</tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+
+        // 更新多媒体控制
+        function updateMediaControls() {
+            const musicPlayer = currentData.find(d => d.device_type === 'MusicPlayer')?.devices_states.music_player;
+            const videoPlayer = currentData.find(d => d.device_type === 'VideoPlayer')?.devices_states.video_player;
+            const container = document.getElementById('media-container');
+
+            // 清除旧内容
+            container.innerHTML = '<h2>多媒体系统</h2>';
+
+            // 音乐播放器控制
+            if (musicPlayer) {
+                const musicSection = document.createElement('div');
+                musicSection.className = 'media-section';
+                musicSection.innerHTML = `
+                    <h3>音乐播放器</h3>
+                    <div class="status-item">
+                        <span>状态</span>
+                        <span>${musicPlayer.play ? '▶️ 播放中' : '⏸️ 已暂停'}</span>
+                    </div>
+                    <div class="status-item">
+                        <span>当前曲目</span>
+                        <span>${musicPlayer.current_music || '无'}</span>
+                    </div>
+                    <div class="status-item">
+                        <span>音量</span>
+                        <input type="range" 
+                               min="0" 
+                               max="100" 
+                               value="${musicPlayer.volume}" 
+                               onchange="handleVolumeChange('music', this.value)"
+                               ${musicPlayer.play ? '' : 'disabled'}>
+                    </div>
+                `;
+                container.appendChild(musicSection);
+            }
+
+            // 视频播放器控制
+            if (videoPlayer) {
+                const videoSection = document.createElement('div');
+                videoSection.className = 'media-section';
+                videoSection.innerHTML = `
+                    <h3>视频播放器</h3>
+                    <div class="status-item">
+                        <span>状态</span>
+                        <span>${videoPlayer.play ? '▶️ 播放中' : '⏸️ 已暂停'}</span>
+                    </div>
+                    <div class="status-item">
+                        <span>当前视频</span>
+                        <span>${videoPlayer.current_video || '无'}</span>
+                    </div>
+                    <div class="status-item">
+                        <span>音量</span>
+                        <input type="range" 
+                               min="0" 
+                               max="100" 
+                               value="${videoPlayer.volume}" 
+                               onchange="handleVolumeChange('video', this.value)"
+                               ${videoPlayer.play ? '' : 'disabled'}>
+                    </div>
+                `;
+                container.appendChild(videoSection);
+            }
+        }
+
+        // 音量变更处理
+        async function handleVolumeChange(type, value) {
+            try {
+                const response = await fetch(`/api/media/volume/${type}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ value: parseInt(value) })
+                });
+                
+                if (!response.ok) {
+                    console.error('音量调整失败');
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+            }
+        }
+
+        // 更新地图
+        function updateMap() {
+            const gpsData = currentData.find(d => d.device_type === 'GPSDevice');
+            if (!gpsData || !mapInstance) return;
+
+            const { latitude, longitude } = gpsData.devices_states.GPS;
+            mapInstance.setView([latitude, longitude], 13);
+        }
+
+        // 初始化地图
+        function initMap() {
+            const gpsData = currentData?.find(d => d.device_type === 'GPSDevice');
+            if (!gpsData || mapInstance) return;
+
+            const { latitude, longitude } = gpsData.devices_states.GPS;
+            mapInstance = L.map('map').setView([latitude, longitude], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+        }
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 立即获取数据
+            fetchData();
+            
+            // 每2秒更新一次
+            setInterval(fetchData, 1000);
+            
+            // 初始化地图
+            initMap();
+        });
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</body>
+</html>
